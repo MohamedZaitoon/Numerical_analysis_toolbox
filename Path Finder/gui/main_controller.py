@@ -91,10 +91,6 @@ class MatPlotLibWidget(QMainWindow):
         self.dialog = EquationForm(self)
         self.edit_function_button.clicked.connect(self.edit_function)
 
-        #self.equation = "np.float_power(x, 3) - 0.165*np.float_power(x, 2)+ 3.9993*np.float_power(10, -4)"
-        #self.equation = "np.sin(np.cos(np.exp(x)))"
-        self.equation = "np.exp(-x) - x"
-
     def show_results(self):
         self.root_value_text.setText(str(self.method.get_root_value()))
         self.iterations_text.setText(str(self.method.get_iterations()))
@@ -195,6 +191,8 @@ class EquationForm(QWidget):
         self.delete_button.clicked.connect(self.delete)
         self.submit_button.clicked.connect(self.submit)
         self.validity_button.clicked.connect(self.check_validity)
+
+        print(self.button_0.text())
 
     def variable_x(self):
         self.equation += "x"
@@ -318,8 +316,8 @@ class EquationForm(QWidget):
         self.equation_text.setText(str(self.equation_text.toPlainText()) + "arctan(")
 
     def power(self):
-        self.equation += "float_power("
-        self.equation_text.setText(str(self.equation_text.toPlainText()) + "pow(")
+        self.equation += "**"
+        self.equation_text.setText(str(self.equation_text.toPlainText()) + "^")
 
     def log(self):
         self.equation += "log("
@@ -334,6 +332,8 @@ class EquationForm(QWidget):
         self.equation_text.setText(str(self.equation_text.toPlainText()) + ",")
 
     def delete(self):
+        if self.equation == "":
+            return
         self.equation = self.equation[:-1]
         self.equation_text.setText(str(self.equation_text.toPlainText())[:-1])
 
