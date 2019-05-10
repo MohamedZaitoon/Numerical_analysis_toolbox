@@ -1,6 +1,6 @@
 import numpy as np
-from sympy import *
 from path_finder_methods.abstract_method import Method
+import time
 
 
 class Bisection(Method):
@@ -19,6 +19,8 @@ class Bisection(Method):
         self.error = False
         self.absolute_error_criteria = 0.00001
         self.max_iterations_criteria = 50
+        self.start = None
+        self.end = None
 
     def f(self, x):
         return eval(self.equation, None, {'x': x})
@@ -37,6 +39,7 @@ class Bisection(Method):
             self.error = True
             return
         i = 1
+        self.start = time.time()
         for i in range(1, self.max_iterations_criteria):
             previous_root_value = self.root_value
             self.root_value = (self.lower_value + self.upper_value) / 2
@@ -54,6 +57,7 @@ class Bisection(Method):
                 self.absolute_error = 0
             if i > 1 and self.absolute_error < self.absolute_error_criteria:
                 break
+        self.end = time.time()
         self.iterations = i
 
     def set_absolute_error_criteria(self, absolute_error_criteria):
@@ -67,6 +71,9 @@ class Bisection(Method):
 
     def get_iterations(self):
         return self.iterations
+
+    def get_execution_time(self):
+        return self.end - self.start
 
     def get_error(self):
         return self.error

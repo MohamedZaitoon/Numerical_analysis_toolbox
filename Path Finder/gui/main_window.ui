@@ -44,7 +44,7 @@
    <bool>false</bool>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: rgb(44, 41, 86, 255);</string>
+   <string notr="true">background-color: rgb(29, 27, 58);</string>
   </property>
   <property name="animated">
    <bool>true</bool>
@@ -760,6 +760,101 @@
      </property>
      <property name="text">
       <string>_____</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="execution_time">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>115</y>
+       <width>90</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color:black;background-color : rgb(255, 52, 55);border-radius : 8;
+</string>
+     </property>
+     <property name="text">
+      <string>   Execution time:</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="execution_time_text">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>115</y>
+       <width>180</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">border-radius : 8;</string>
+     </property>
+     <property name="inputMask">
+      <string/>
+     </property>
+     <property name="text">
+      <string>_____</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="T">
+     <property name="geometry">
+      <rect>
+       <x>310</x>
+       <y>10</y>
+       <width>101</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color:black;background-color : rgb(255, 52, 55);border-radius : 8;
+</string>
+     </property>
+     <property name="text">
+      <string>  Theoretical Bound</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="theoretical_bound_text">
+     <property name="geometry">
+      <rect>
+       <x>420</x>
+       <y>10</y>
+       <width>101</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">border-radius : 8;</string>
+     </property>
+     <property name="inputMask">
+      <string/>
+     </property>
+     <property name="text">
+      <string>_____</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="compare_button">
+     <property name="geometry">
+      <rect>
+       <x>440</x>
+       <y>60</y>
+       <width>90</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="cursor">
+      <cursorShape>PointingHandCursor</cursorShape>
+     </property>
+     <property name="autoFillBackground">
+      <bool>false</bool>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(255, 39, 42);color:white;
+</string>
+     </property>
+     <property name="text">
+      <string>Compare</string>
      </property>
     </widget>
    </widget>

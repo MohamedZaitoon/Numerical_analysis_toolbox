@@ -95,6 +95,7 @@ class MatPlotLibWidget(QMainWindow):
         self.root_value_text.setText(str(self.method.get_root_value()))
         self.iterations_text.setText(str(self.method.get_iterations()))
         self.absolute_error_text.setText(str(self.method.get_absolute_error()))
+        self.execution_time_text.setText(str(self.method.get_execution_time()))
 
     def edit_function(self):
         self.dialog.show()
@@ -148,6 +149,7 @@ class EquationForm(QWidget):
         self.main_window = main_window
         self.equation = ""
         self.equation_text.setText("")
+        self.free_style = False
 
         self.variable_x_button.clicked.connect(self.variable_x)
         self.clear_button.clicked.connect(self.clear)
@@ -191,8 +193,7 @@ class EquationForm(QWidget):
         self.delete_button.clicked.connect(self.delete)
         self.submit_button.clicked.connect(self.submit)
         self.validity_button.clicked.connect(self.check_validity)
-
-        print(self.button_0.text())
+        self.free_style_button.clicked.connect(self.activate_free_style)
 
     def variable_x(self):
         self.equation += "x"
@@ -337,8 +338,14 @@ class EquationForm(QWidget):
         self.equation = self.equation[:-1]
         self.equation_text.setText(str(self.equation_text.toPlainText())[:-1])
 
+    def activate_free_style(self):
+        self.free_style = not self.free_style
+        self.equation_text.setEnabled(self.free_style)
+
     def check_validity(self):
         try:
+            if self.free_style:
+                self.equation = str(self.equation_text.toPlainText()).replace("^", "**")
             eval(self.equation, None, {'x': 0})
             self.notification_text.setText("Valid Equation")
             return True

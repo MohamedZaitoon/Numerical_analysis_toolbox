@@ -24,6 +24,10 @@ class Method(ABC):
         pass
 
     @abstractmethod
+    def get_execution_time(self):
+        pass
+
+    @abstractmethod
     def get_error(self):
         pass
 

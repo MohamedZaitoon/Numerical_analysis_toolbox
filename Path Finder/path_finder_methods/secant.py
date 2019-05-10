@@ -1,6 +1,7 @@
 import numpy as np
 from sympy import *
 from path_finder_methods.abstract_method import Method
+import time
 
 
 class Secant(Method):
@@ -19,6 +20,8 @@ class Secant(Method):
         self.error = False
         self.absolute_error_criteria = 0.00001
         self.max_iterations_criteria = 50
+        self.start = None
+        self.end = None
 
     def f(self, x):
         return eval(self.equation, None, {'x': x})
@@ -28,6 +31,7 @@ class Secant(Method):
         self.steps.append(step)
 
     def evaluate(self):
+        self.start = time.time()
         i = 1
         for i in range(1, self.max_iterations_criteria):
             previous_root_value = self.root_value
@@ -43,6 +47,7 @@ class Secant(Method):
             self.upper_value = self.root_value
             if i > 1 and self.absolute_error < self.absolute_error_criteria:
                 break
+        self.end = time.time()
         self.iterations = i
 
     def set_absolute_error_criteria(self, absolute_error_criteria):
@@ -56,6 +61,9 @@ class Secant(Method):
 
     def get_iterations(self):
         return self.iterations
+
+    def get_execution_time(self):
+        return self.end - self.start
 
     def get_error(self):
         return self.error
