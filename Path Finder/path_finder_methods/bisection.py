@@ -1,4 +1,4 @@
-import numpy as np
+from numpy import *
 from path_finder_methods.abstract_method import Method
 import time
 
@@ -8,7 +8,7 @@ class Bisection(Method):
 
     def __init__(self, equation, lower_value,  upper_value):
         self.equation = equation
-        self.scale = 10
+        self.scale = 1
         self.graph = None
         self.step_position = 0
         self.lower_value = lower_value
@@ -19,8 +19,8 @@ class Bisection(Method):
         self.error = False
         self.absolute_error_criteria = 0.00001
         self.max_iterations_criteria = 50
-        self.start = None
-        self.end = None
+        self.start = 0
+        self.end = 0
 
     def f(self, x):
         return eval(self.equation, None, {'x': x})
@@ -44,9 +44,9 @@ class Bisection(Method):
             previous_root_value = self.root_value
             self.root_value = (self.lower_value + self.upper_value) / 2
             if i > 1:
-                self.absolute_error = np.abs(self.root_value - previous_root_value)
+                self.absolute_error = abs(self.root_value - previous_root_value)
             else:
-                self.absolute_error = np.abs(self.root_value - self.lower_value)
+                self.absolute_error = abs(self.root_value - self.lower_value)
             self.add_step()
             test = self.f(self.lower_value) * self.f(self.root_value)
             if test < 0:
@@ -54,8 +54,10 @@ class Bisection(Method):
             else:
                 self.lower_value = self.root_value
             if test == 0:
+                self.root_value = self.lower_value if self.f(self.lower_value) == 0 else self.root_value
                 self.absolute_error = 0
-            if i > 1 and self.absolute_error < self.absolute_error_criteria:
+                break
+            if i > 1 and self.absolute_error <= self.absolute_error_criteria:
                 break
         self.end = time.time()
         self.iterations = i
@@ -88,10 +90,13 @@ class Bisection(Method):
         initial_step = self.steps[0]
         initial_lower = initial_step[0]
         initial_upper = initial_step[1]
-        x = np.linspace((self.f(initial_lower - np.fabs(initial_upper) * self.scale)
-                        + lower_value - np.fabs(upper_value) * self.scale) / 2,
-                        (self.f(initial_upper + np.fabs(initial_upper) * self.scale)
-                         + upper_value + np.fabs(upper_value) * self.scale) / 2, 10)
+        graph_x_min = (self.f(initial_lower - fabs(initial_upper) * self.scale)
+                       + lower_value - fabs(upper_value) * self.scale) / 2
+        graph_x_max = (self.f(initial_upper + fabs(initial_upper) * self.scale)
+                       + upper_value + fabs(upper_value) * self.scale) / 2
+        x = linspace(graph_x_min, graph_x_max, 10)
+        self.graph.axes.set_xlim(graph_x_min, graph_x_max)
+        self.graph.axes.set_ylim(graph_x_min, graph_x_max)
         self.graph.axes.plot(lower_value + x * 0, x, linestyle="dashed")
         self.graph.axes.plot(upper_value + x * 0, x, linestyle="dashed")
         self.graph.axes.plot(x, x * 0, linestyle='dotted')
@@ -116,8 +121,8 @@ class Bisection(Method):
         step = self.steps[self.step_position]
         lower = step[0]
         upper = step[1]
-        x = np.linspace(lower - np.fabs(upper) * self.scale,
-                        upper + np.fabs(upper) * self.scale, 1000)
+        x = linspace(lower - fabs(upper) * self.scale,
+                     upper + fabs(upper) * self.scale, 1000)
         graph.axes.clear()
         graph.axes.plot(x, eval(self.equation))
         self.plot_step()

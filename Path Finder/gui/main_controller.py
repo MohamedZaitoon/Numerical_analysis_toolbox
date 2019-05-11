@@ -4,72 +4,11 @@ from matplotlib.backends.backend_qt5agg import (NavigationToolbar2QT as Navigati
 from numpy import *
 from path_finder_methods.bisection import Bisection
 from path_finder_methods.secant import Secant
+from path_finder_methods.bierge_vieta import BiergeVieta
+from path_finder_methods.fixed_point import FixedPoint
 
 
 class MatPlotLibWidget(QMainWindow):
-
-    def solve(self):
-        current_method = str(self.selected_method.currentText())
-        self.iteration_counter = 0
-        self.clear_components()
-        if self.equation is None:
-            self.notification.setText("ERROR: Equation is not available")
-            return
-        if str(self.lower_value_text.text()) == "":
-            self.notification.setText("ERROR: Lower Value is not available")
-            return
-        try:
-            current_lower_value = float(str(self.lower_value_text.text()))
-        except ValueError:
-            self.notification.setText("ERROR: Lower value error")
-            return
-
-        if current_method == "Bisection":
-            try:
-                if str(self.upper_value_text.text()) == "":
-                    self.notification.setText("ERROR: Upper value is not set")
-                    return
-                current_upper_value = float(self.upper_value_text.text())
-                if self.upper_value_text.text() == "":
-                    self.notification.setText("ERROR: Upper value is not available")
-                    return
-            except ValueError:
-                self.notification.setText("ERROR: Upper value error")
-                return
-            self.method = Bisection(self.equation, current_lower_value, current_upper_value)
-        elif current_method == "Secant":
-            try:
-                if str(self.upper_value_text.text()) == "":
-                    self.notification.setText("ERROR: Upper value is not set")
-                    return
-                current_upper_value = float(self.upper_value_text.text())
-                if self.upper_value_text.text() == "":
-                    self.notification.setText("ERROR: Upper value is not available")
-                    return
-            except ValueError:
-                self.notification.setText("ERROR: Upper value error")
-                return
-            self.method = Secant(self.equation, current_lower_value, current_upper_value)
-        self.method.set_absolute_error_criteria(self.current_absolute)
-        self.method.set_max_iterations_criteria(self.current_iterations)
-        self.method.evaluate()
-        if self.method.get_error():
-            self.notification.setText("Method Error: Invalid guesses or divergence may occurred")
-            return
-
-        self.method.plot(self.MplWidget.canvas)
-        self.show_results()
-
-    def clear_components(self):
-        self.notification.setText("")
-        self.step_lower_value_text.setText("")
-        self.step_upper_value_text.setText("")
-        self.step_root_value_text.setText("")
-        self.step_absolute_error.setText("")
-        self.iteration_couner_text.setText("")
-        self.root_value_text.setText("")
-        self.iterations_text.setText("")
-        self.absolute_error_text.setText("")
 
     def __init__(self):
         QMainWindow.__init__(self)
@@ -83,6 +22,14 @@ class MatPlotLibWidget(QMainWindow):
         self.next_step_button.clicked.connect(self.next_step)
         self.previous_step_button.clicked.connect(self.previous_step)
         self.adjust_criteria_button.clicked.connect(self.adjust_criteria)
+        self.selected_method.activated.connect(self.adjust_parameters)
+
+        self.scale_slider.setTickInterval(100)
+        self.scale_slider.setMinimum(0)
+        self.scale_slider.setSingleStep(1)
+        self.scale_slider.sliderMoved.connect(self.slider_moved)
+        self.scale = 1
+
         self.current_absolute = 0.00001
         self.current_iterations = 50
 
@@ -91,22 +38,108 @@ class MatPlotLibWidget(QMainWindow):
         self.dialog = EquationForm(self)
         self.edit_function_button.clicked.connect(self.edit_function)
 
+    def solve(self):
+        current_method = str(self.selected_method.currentText())
+        self.iteration_counter = 0
+        current_upper_value = None
+        self.clear_components()
+
+        if self.equation is None:
+            self.notification.setText("ERROR: Equation is not available")
+            return
+
+        if str(self.lower_value_text.text()) == "":
+            self.notification.setText("ERROR: Lower Value is not available")
+            return
+        else:
+            try:
+                current_lower_value = float(str(self.lower_value_text.text()))
+            except ValueError:
+                self.notification.setText("ERROR: Lower value error")
+                return
+
+        if self.upper_value_text.isEnabled():
+            if str(self.upper_value_text.text()) == "":
+                self.notification.setText("ERROR: Upper value is not available")
+                return
+            else:
+                try:
+                    current_upper_value = float(self.upper_value_text.text())
+                except ValueError:
+                    self.notification.setText("ERROR: Upper value error")
+                    return
+
+        if current_method == "Bisection":
+            self.method = Bisection(self.equation, current_lower_value, current_upper_value)
+        elif current_method == "Secant":
+            self.method = Secant(self.equation, current_lower_value, current_upper_value)
+        elif current_method == "Bierge-Vieta":
+            self.method = BiergeVieta(self.equation, current_lower_value)
+        elif current_method == "Fixed Point":
+            self.method = FixedPoint(self.equation, current_lower_value)
+
+        self.method.set_absolute_error_criteria(self.current_absolute)
+        self.method.set_max_iterations_criteria(self.current_iterations)
+        self.method.set_scale(self.scale)
+        try:
+            self.method.evaluate()
+            if self.method.get_error():
+                self.notification.setText("Method Error: Invalid guesses or divergence may occurred")
+                return
+
+            self.method.plot(self.MplWidget.canvas)
+            self.show_results()
+        except Exception:
+            self.notification.setText("Error")
+
+    def clear_components(self):
+        self.notification.setText("")
+        self.step_lower_value_text.setText("")
+        self.step_upper_value_text.setText("")
+        self.step_root_value_text.setText("")
+        self.step_absolute_error.setText("")
+        self.iteration_couner_text.setText("")
+        self.root_value_text.setText("")
+        self.iterations_text.setText("")
+        self.absolute_error_text.setText("")
+
+    def adjust_parameters(self):
+        two_parameter_method = ("Bisection", "Secant")
+        one_parameter_method = ("Bierge-Vieta", "Fixed Point")
+        selected_method = self.selected_method.currentText()
+        if two_parameter_method.count(selected_method) != 0:
+            self.upper_value_text.setEnabled(True)
+        elif one_parameter_method.count(selected_method) != 0:
+            self.upper_value_text.setEnabled(False)
+            self.upper_value_text.setText("")
+        else:
+            pass
+
     def show_results(self):
         self.root_value_text.setText(str(self.method.get_root_value()))
         self.iterations_text.setText(str(self.method.get_iterations()))
         self.absolute_error_text.setText(str(self.method.get_absolute_error()))
         self.execution_time_text.setText(str(self.method.get_execution_time()))
 
+    def slider_moved(self):
+        value = self.scale_slider.value()
+        self.scale = value
+        self.scale_text.setText(str(value))
+
     def edit_function(self):
         self.dialog.show()
 
     def show_step(self, step):
+        adjust_index = 1
+        if self.upper_value_text.isEnabled():
+            adjust_index = 0
+            upper_value = round(step[1], self.round_margin)
+            self.step_upper_value_text.setText(str(upper_value))
+
         lower_value = round(step[0], self.round_margin)
-        upper_value = round(step[1], self.round_margin)
-        root_value = round(step[2], self.round_margin)
-        absolute_error = round(step[3], self.round_margin)
+        root_value = round(step[2 - adjust_index], self.round_margin)
+        absolute_error = round(step[3 - adjust_index], self.round_margin)
         self.step_lower_value_text.setText(str(lower_value))
-        self.step_upper_value_text.setText(str(upper_value))
         self.step_root_value_text.setText(str(root_value))
         self.step_absolute_error.setText(str(absolute_error))
 
