@@ -94,10 +94,9 @@ class Bisection(Method):
         initial_lower = initial_step[0]
         initial_upper = initial_step[1]
         self.graph.axes.set_xlim(initial_lower - 2, initial_upper + 2)
-        self.graph.axes.set_ylim(-10, 10)
+        #self.graph.axes.set_ylim(initial_step[-2], initial_step[-1])
         self.graph.axes.axvline(lower_value, linestyle="dashed", color="r")
         self.graph.axes.axvline(upper_value, linestyle="dashed", color="g")
-        self.graph.draw()
 
     def next_step(self, ):
         if self.step_position == self.iterations:

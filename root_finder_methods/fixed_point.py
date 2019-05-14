@@ -91,11 +91,9 @@ class FixedPoint(Method):
                        + lower_value - fabs(upper_value) * self.scale) / 2
         graph_x_max = (self.f(initial_upper + fabs(initial_upper) * self.scale)
                        + upper_value + fabs(upper_value) * self.scale) / 2
-        x = linspace(graph_x_min, graph_x_max, 10)
+        x = linspace(graph_x_min, graph_x_max, 1000)
 
         self.graph.axes.plot(x, eval(str(self.g)), linestyle="dashed")
-        self.graph.axes.plot(x, 1 * x, linestyle='dashed')
-        self.graph.axes.plot(x, x * 0, linestyle='dotted')
         self.graph.draw()
 
     def plot(self, graph):
@@ -104,7 +102,7 @@ class FixedPoint(Method):
         lower = step[0]
         upper = lower * 5 * self.scale
         x = linspace(lower - fabs(upper) * self.scale,
-                     upper + fabs(upper) * self.scale, 20)
+                     upper + fabs(upper) * self.scale, 1000)
         graph.axes.clear()
         graph.axes.plot(x, eval(str(self.equation)))
         graph.axes.axhline(0, color="black")

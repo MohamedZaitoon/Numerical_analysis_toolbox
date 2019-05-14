@@ -9,7 +9,7 @@ from root_finder_methods.bierge_vieta import BiergeVieta
 from root_finder_methods.bisection import Bisection
 from root_finder_methods.fixed_point import FixedPoint
 from root_finder_methods.secant import Secant
-# from root_finder_methods.newtonRaphson import NewtonRaphson
+from root_finder_methods.newtonRaphson import NewtonRaphson
 from ui.keypad import EquationForm
 
 
@@ -83,10 +83,12 @@ class MatPlotLibWidget(QMainWindow):
         elif current_method == "Fixed Point":
             self.method = FixedPoint(self.equation, current_lower_value)
         elif current_method == "Newton-Raphson":
-            self.method = FixedPoint(self.equation, current_lower_value)
+            self.method = NewtonRaphson(self.equation, current_lower_value)
         elif current_method == "False Position":
             self.method = FalsePosition(self.equation, current_lower_value, current_upper_value)
         elif current_method == "General Algorithm":
+            self.method = GeneralAlgorithm(self.equation)
+        elif current_method == "All Methods":
             self.method = GeneralAlgorithm(self.equation)
 
         self.method.set_absolute_error_criteria(self.current_absolute)
@@ -101,7 +103,6 @@ class MatPlotLibWidget(QMainWindow):
             self.method.plot(self.MplWidget.canvas)
             self.show_results()
         except Exception:
-
             self.notification.setText("Error")
 
     def clear_components(self):
@@ -117,7 +118,7 @@ class MatPlotLibWidget(QMainWindow):
 
     def adjust_parameters(self):
         two_parameter_method = ("Bisection", "Secant")
-        one_parameter_method = ("Bierge-Vieta", "Fixed Point")
+        one_parameter_method = ("Bierge-Vieta", "Fixed Point","Newton-Raphson")
         selected_method = self.selected_method.currentText()
         if two_parameter_method.count(selected_method) != 0:
             self.upper_value_text.setEnabled(True)

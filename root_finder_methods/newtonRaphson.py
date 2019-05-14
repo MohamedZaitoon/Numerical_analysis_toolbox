@@ -1,22 +1,17 @@
-import re
-import csv
-import os
 import time
-import numpy as np
+
+from numpy import *
 from scitools.StringFunction import StringFunction
 from sympy import Derivative, Symbol
-from root_finder_methods.abstract_method import *
+from tabulate import tabulate
+
+from root_finder_methods.abstract_method import Method
 
 
 class NewtonRaphson(Method):
 
     def __init__(self, equation, x_guess=2):
         self.x = 1
-        self.replacements = {
-            'sin': 'np.sin',
-            'cos': 'np.cos',
-            '^': '**', 'e': 'np.e', 'tan': 'np.tan', 'exp': 'np.exp'}
-        self.allowed_words = ['x', 'sin', 'cos', 'tan', 'e', 'exp', 'log', 'log2']
         self.tabel = []
         self.equation = equation
         self.graph = None
@@ -28,24 +23,10 @@ class NewtonRaphson(Method):
         self.iterations = 0
         self.start = None
         self.end = None
+        self.error = False
         self.current = 0  # current index for next & prev
 
     def evaluate(self):
-        # handling equation
-        def find(st, ch):
-            return [t for t, ltr in enumerate(st) if ltr == ch]
-
-        s = find(self.equation, 'e')
-        if len(s) != 0:
-            for r in s:
-                if r + 1 == len(self.equation):
-                    print("please replace 'e' with 'exp()' and try again!")
-                    return
-                else:
-                    if self.equation[r + 1] != 'x':
-                        print("please replace 'e' with 'exp()' and try again!")
-                        return
-
         equation = self.equation.replace('^', '**')
         self.equation = equation
 
@@ -63,27 +44,29 @@ class NewtonRaphson(Method):
                 self.root = None
                 print("Error division by zero!")
                 print("diverge")
+                self.error = True
                 return
             x_new = float(x_old) - f1 / f2
             error = abs(x_new - x_old)
-
-            self.tabel.append([i, x_old, x_new, f1, f2, error])
-            print(self.tabel[i])
+            self.tabel.append([x_old, x_new, error, f1, f2])
+            # print(self.tabel[i])
             self.iterations = i
             if self.__f(x_new) == 0:
                 self.root = x_new
                 print("--success--")
+                self.error = False
                 return
-
             x_old = x_new
             i = i + 1
         self.end = time.time()
         if i == 51:
             self.root = None
             print("--diverge-- or need more iteration than 50")
+            self.error = True
         else:
             self.root = x_old
             print("--success--")
+            self.error = False
 
         return
 
@@ -95,9 +78,8 @@ class NewtonRaphson(Method):
         self.maxIt = max_iterations_criteria
         pass
 
-    # waiting alkhaligy
     def get_absolute_error(self):
-        pass
+        return self.tabel[len(self.tabel) - 1][2]
 
     def get_iterations(self):
         return self.iterations
@@ -105,59 +87,54 @@ class NewtonRaphson(Method):
     def get_execution_time(self):
         return abs(self.end - self.start)
 
-    # waiting alkhaligy
     def get_error(self):
-        pass
+        return self.error
 
     def get_root_value(self):
         return self.root
 
     def plot(self, graph):
-        self.graph = graph.axes
-        func = self.__string2function(self.equation)
-        lastx = self.tabel[len(self.tabel) - 1][2]
+        self.graph = graph
+        self.graph.axes.clear()
+        lastx = self.tabel[len(self.tabel) - 1][1]
         if self.guess >= lastx:
-            x = np.arange(lastx - 1, self.guess + 1, 0.00005)
-            self.graph.plot([self.guess + 1, lastx - 1], [0, 0], 'k-')  # x-axis
+            x = linspace(lastx - 3, self.guess + 3, 100000)
+            # self.graph.axes.plot([self.guess + 1, lastx - 1], [0, 0], 'k-')  # x-axis
             # graph.plot([0, 0], [self.guess + 3, lastx - 3], 'k-')  # y-axis
         else:
-            x = np.arange(self.guess - 1, lastx + 1, 0.00005)
-            self.graph.plot([self.guess - 1, lastx + 1], [0, 0], 'k-')  # x-axis
-            # graph.plot([0, 0], [self.guess - 3, lastx + 3], 'k-')  # y-axis
-        self.graph.plot(x, func(x))
+            x = linspace(self.guess - 3, lastx + 3, 100000)
+            # self.graph.axes.plot([self.guess - 1, lastx + 1], [0, 0], 'k-')  # x-axis
+            # self.graph.axes.plot([0, 0], [self.guess - 3, lastx + 3], 'k-')  # y-axis
+        self.graph.axes.plot(x, eval(self.equation))
 
-        for row in self.tabel:
-            self.graph.plot([row[1], row[2]], [func(row[1]), 0])
-            self.graph.plot([row[1], row[1]], [0, func(row[1])])
-            self.graph.plot([row[2], row[2]], [0, func(row[2])])
+        for i in range(0, self.current + 1):
+            row = self.tabel[i]
+            self.graph.axes.plot([row[0], row[1]], [self.__f(row[0]), 0])
+            self.graph.axes.plot([row[0], row[0]], [0, self.__f(row[0])])
+            self.graph.axes.plot([row[1], row[1]], [0, self.__f(row[1])])
         graph.axes.axhline(0, color="black")
         graph.axes.axvline(0, color="black")
-        graph.draw()
+        self.graph.draw()
         pass
 
     def next_step(self):
         if self.current != len(self.tabel):
             self.current = self.current + 1
-        self.__plot(self.graph, self.current)
-        pass
+        self.plot(self.graph)
+        return self.tabel[self.current]
 
     def prev_step(self):
-        if self.current != 1:
+        if self.current != 0:
             self.current = self.current - 1
-        self.__plot(self.graph, self.current)
-        pass
+        self.plot(self.graph)
+        return self.tabel[self.current]
 
     def set_scale(self, scale):
         self.scale = scale
 
-    def output_file(self):
-        dirname = os.path.dirname(__file__)
-        filename = os.path.join(dirname, 'newtonOutput.csv')
-        with open(filename, 'w') as csvfile:
-            writer = csv.writer(csvfile, delimiter='|')
-            writer.writerow(["Iteration", "X(i)", "X(i+1)", "f(Xi)", "f’(Xi)", "AbsError"])
-            for row in self.tabel:
-                writer.writerow(row)
+    def output_file(self, path1):
+        write = PrintToFile(path1, self.tabel)
+        write.print()
 
     # additional private methods
     def __f(self, x):
@@ -171,31 +148,23 @@ class NewtonRaphson(Method):
         dy = StringFunction(str(dydx))
         return dy(x)
 
-    def __plot(self, graph, idx):
-        func = self.string2function(self.equation)
-        lastx = self.tabel[len(self.tabel) - 1][2]
-        if self.guess >= lastx:
-            x = np.arange(lastx - 1, self.guess + 1, 0.00005)
-            graph.plot([self.guess + 1, lastx - 1], [0, 0], 'k-')  # x-axis
-            # graph.plot([0, 0], [self.guess + 3, lastx - 3], 'k-')  # y-axis
-        else:
-            x = np.arange(self.guess - 1, lastx + 1, 0.00005)
-            graph.plot([self.guess - 1, lastx + 1], [0, 0], 'k-')  # x-axis
-            # graph.plot([0, 0], [self.guess - 3, lastx + 3], 'k-')  # y-axis
-        graph.plot(x, func(x))
-        for i in range(0, idx):
-            row = self.tabel[i]
-            graph.plot([row[1], row[2]], [func(row[1]), 0])
-            graph.plot([row[1], row[1]], [0, func(row[1])])
-            graph.plot([row[2], row[2]], [0, func(row[2])])
 
-    def __string2function(self, string):
-        for word in re.findall('[a-zA-Z_]+', string):
-            if word not in self.allowed_words:
-                raise ValueError('"{}" is forbidden to use in math expression'.format(word))
-        for old, new in self.replacements.items():
-            string = string.replace(old, new)
+class PrintToFile:
+    def __init__(self, path, table):
+        self.path = path
+        self.table = table
 
-        def func(x):
-            return eval(string)
-        return func
+    def print(self):
+        s = tabulate(self.table, tablefmt='orgtbl')
+        f = open(self.path, 'w+')
+        f.write(s)
+        f.close()
+
+
+if __name__ == "__main__":
+    # test
+    t = NewtonRaphson('exp(x^2-4)', 3)
+    t.evaluate()
+    t.output_file('newton.txt')
+    print(t.get_absolute_error())
+    print(t.get_error())

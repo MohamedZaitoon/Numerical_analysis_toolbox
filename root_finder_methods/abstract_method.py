@@ -52,5 +52,5 @@ class Method(ABC):
         pass
 
     @abstractmethod
-    def output_file(self):
+    def output_file(self, path=""):
         pass
