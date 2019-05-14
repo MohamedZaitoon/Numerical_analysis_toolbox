@@ -3,10 +3,13 @@ from PyQt5.uic import loadUi
 from matplotlib.backends.backend_qt5agg import (NavigationToolbar2QT as NavigationToolbar)
 from numpy import *
 
+from root_finder_methods.FalsePosition import FalsePosition
+from root_finder_methods.GeneralAlgorithm import GeneralAlgorithm
 from root_finder_methods.bierge_vieta import BiergeVieta
 from root_finder_methods.bisection import Bisection
 from root_finder_methods.fixed_point import FixedPoint
 from root_finder_methods.secant import Secant
+# from root_finder_methods.newtonRaphson import NewtonRaphson
 from ui.keypad import EquationForm
 
 
@@ -79,6 +82,12 @@ class MatPlotLibWidget(QMainWindow):
             self.method = BiergeVieta(self.equation, current_lower_value)
         elif current_method == "Fixed Point":
             self.method = FixedPoint(self.equation, current_lower_value)
+        elif current_method == "Newton-Raphson":
+            self.method = FixedPoint(self.equation, current_lower_value)
+        elif current_method == "False Position":
+            self.method = FalsePosition(self.equation, current_lower_value, current_upper_value)
+        elif current_method == "General Algorithm":
+            self.method = GeneralAlgorithm(self.equation)
 
         self.method.set_absolute_error_criteria(self.current_absolute)
         self.method.set_max_iterations_criteria(self.current_iterations)
@@ -92,6 +101,7 @@ class MatPlotLibWidget(QMainWindow):
             self.method.plot(self.MplWidget.canvas)
             self.show_results()
         except Exception:
+
             self.notification.setText("Error")
 
     def clear_components(self):

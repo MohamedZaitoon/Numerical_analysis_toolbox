@@ -99,6 +99,8 @@ class Secant(Method):
         graph.axes.clear()
         graph.axes.plot(x, eval(self.equation))
         self.plot_step()
+        graph.axes.axhline(0, color="black")
+        graph.axes.axvline(0, color="black")
         graph.draw()
 
     def next_step(self):

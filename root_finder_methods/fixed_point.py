@@ -107,6 +107,8 @@ class FixedPoint(Method):
                      upper + fabs(upper) * self.scale, 20)
         graph.axes.clear()
         graph.axes.plot(x, eval(str(self.equation)))
+        graph.axes.axhline(0, color="black")
+        graph.axes.axvline(0, color="black")
         self.plot_step()
         graph.draw()
 

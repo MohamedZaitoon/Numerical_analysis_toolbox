@@ -10,7 +10,7 @@ from root_finder_methods.abstract_method import *
 
 class NewtonRaphson(Method):
 
-    def __init__(self, equation):
+    def __init__(self, equation, x_guess=2):
         self.x = 1
         self.replacements = {
             'sin': 'np.sin',
@@ -21,7 +21,7 @@ class NewtonRaphson(Method):
         self.equation = equation
         self.graph = None
         self.root = None
-        self.guess = 2
+        self.guess = x_guess
         self.allowed_error: float = 0.00001
         self.maxIt = 50
         self.scale = None
@@ -30,7 +30,7 @@ class NewtonRaphson(Method):
         self.end = None
         self.current = 0  # current index for next & prev
 
-    def evaluate(self, x_guess=2):
+    def evaluate(self):
         # handling equation
         def find(st, ch):
             return [t for t, ltr in enumerate(st) if ltr == ch]
@@ -48,7 +48,6 @@ class NewtonRaphson(Method):
 
         equation = self.equation.replace('^', '**')
         self.equation = equation
-        self.guess = x_guess
 
         # initialize variables
         x_old: float = self.guess
@@ -114,23 +113,26 @@ class NewtonRaphson(Method):
         return self.root
 
     def plot(self, graph):
-        self.graph = graph
+        self.graph = graph.axes
         func = self.__string2function(self.equation)
         lastx = self.tabel[len(self.tabel) - 1][2]
         if self.guess >= lastx:
             x = np.arange(lastx - 1, self.guess + 1, 0.00005)
-            graph.plot([self.guess + 1, lastx - 1], [0, 0], 'k-')  # x-axis
+            self.graph.plot([self.guess + 1, lastx - 1], [0, 0], 'k-')  # x-axis
             # graph.plot([0, 0], [self.guess + 3, lastx - 3], 'k-')  # y-axis
         else:
             x = np.arange(self.guess - 1, lastx + 1, 0.00005)
-            graph.plot([self.guess - 1, lastx + 1], [0, 0], 'k-')  # x-axis
+            self.graph.plot([self.guess - 1, lastx + 1], [0, 0], 'k-')  # x-axis
             # graph.plot([0, 0], [self.guess - 3, lastx + 3], 'k-')  # y-axis
-        graph.plot(x, func(x))
+        self.graph.plot(x, func(x))
 
         for row in self.tabel:
-            graph.plot([row[1], row[2]], [func(row[1]), 0])
-            graph.plot([row[1], row[1]], [0, func(row[1])])
-            graph.plot([row[2], row[2]], [0, func(row[2])])
+            self.graph.plot([row[1], row[2]], [func(row[1]), 0])
+            self.graph.plot([row[1], row[1]], [0, func(row[1])])
+            self.graph.plot([row[2], row[2]], [0, func(row[2])])
+        graph.axes.axhline(0, color="black")
+        graph.axes.axvline(0, color="black")
+        graph.draw()
         pass
 
     def next_step(self):
