@@ -1,21 +1,24 @@
 import time
-from sympy import Poly, sympify
+
 from numpy import *
+from sympy import Poly, sympify
+
 from root_finder_methods.abstract_method import Method
 
 
 class BiergeVieta(Method):
-    steps = []
 
     def __init__(self, equation, lower_value):
         self.equation = equation
         self.lower_value = lower_value
+        self.steps = []
         self.root_value = None
         self.absolute_error = None
         self.error = False
         self.scale = 1
         self.start = 0
         self.end = 0
+        self.graph = None
         self.iterations = 0
         self.step_position = 0
         self.max_iterations_criteria = 50
@@ -85,18 +88,32 @@ class BiergeVieta(Method):
         return self.root_value
 
     def plot(self, graph):
+        self.graph = graph
+        step = self.steps[0]
+        lower = step[0]
+        upper = lower * 5 + 5
+        root = self.get_root_value()
+        x = linspace(int(root - 5), int(root + 5), 1000)
         graph.axes.clear()
+        graph.axes.plot(x, eval(str(self.equation)), linewidth=1, color='c')
+        # graph.axes.plot(x, eval(str(self.equation)), linewidth=1, color='c')
+        graph.axes.axhline(0, color="black", linewidth=1)
+        graph.axes.axvline(0, color="black", linewidth=1)
+        self.plot_step()
+        graph.draw()
 
     def next_step(self):
         if self.step_position == self.iterations:
             return
         self.step_position += 1
+        self.plot(self.graph)
         return self.steps[self.step_position]
 
     def prev_step(self):
         if self.step_position == 0:
             return
         self.step_position -= 1
+        self.plot(self.graph)
         return self.steps[self.step_position]
 
     def set_scale(self, scale):
@@ -104,3 +121,19 @@ class BiergeVieta(Method):
 
     def output_file(self):
         pass
+
+    def get_errors(self):
+        if len(self.steps) == 0:
+            return []
+        else:
+            return [row[2] for row in self.steps]
+
+    def get_roots(self):
+        if len(self.steps) == 0:
+            return []
+        else:
+            return [row[1] for row in self.steps]
+
+    def plot_step(self):
+        x = self.steps[self.step_position][1]
+        self.graph.axes.axvline(x, linestyle="dashed", color="r", linewidth=1)

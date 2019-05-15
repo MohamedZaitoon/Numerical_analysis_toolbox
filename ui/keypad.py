@@ -227,4 +227,5 @@ class EquationForm(QWidget):
         if not self.check_validity():
             return
         self.main_window.set_equation(self.equation)
+        self.main_window.equation_field.setText(self.equation)
         self.close()

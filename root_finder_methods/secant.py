@@ -4,11 +4,11 @@ import time
 
 
 class Secant(Method):
-    steps = []
 
     def __init__(self, equation, lower_value,  upper_value):
         self.equation = equation
         self.scale = 1
+        self.steps = []
         self.graph = None
         self.step_position = 0
         self.lower_value = lower_value
@@ -26,7 +26,8 @@ class Secant(Method):
         return eval(self.equation, None, {'x': x})
 
     def add_step(self):
-        step = (self.lower_value, self.upper_value, self.root_value, self.f(self.root_value), self.absolute_error)
+        step = (self.lower_value, self.upper_value, self.root_value, self.f(self.root_value), self.absolute_error, self.f(self.lower_value),
+                self.f(self.upper_value))
         self.steps.append(step)
 
     def evaluate(self):
@@ -71,36 +72,51 @@ class Secant(Method):
         return self.root_value
 
     def plot_step(self):
+        for i in range(self.step_position):
+            step = self.steps[i]
+            lower_value = step[0]
+            upper_value = step[1]
+            flower = step[-2]
+            fupper = step[-1]
+            current_root = step[2]
+            # x = linspace(lower_value, upper_value, 1000)
+            # coefficient = (fupper - flower) / (upper_value - lower_value)
+            self.graph.axes.plot((lower_value, upper_value), (flower, fupper), linestyle="dashed", color="y", linewidth=1)
+            self.graph.axes.plot((current_root, current_root), (0, self.f(current_root)), color='r', linewidth=1)
+
+            # self.graph.axes.plot((lower_value, upper_value), (flower, fupper), 'r')
+            # self.graph.axes.plot((current_root, current_root), (0, self.f(current_root)), 'r')
         step = self.steps[self.step_position]
         lower_value = step[0]
         upper_value = step[1]
-        initial_step = self.steps[0]
-        initial_lower = initial_step[0]
-        initial_upper = initial_step[1]
-        graph_x_min = (self.f(initial_lower - fabs(initial_upper) * self.scale)
-                       + lower_value - fabs(upper_value) * self.scale) / 2
-        graph_x_max = (self.f(initial_upper + fabs(initial_upper) * self.scale)
-                       + upper_value + fabs(upper_value) * self.scale) / 2
-        x = linspace(graph_x_min, graph_x_max, 10)
-        self.graph.axes.set_xlim(graph_x_min, graph_x_max)
-        self.graph.axes.set_ylim(graph_x_min, graph_x_max)
-        coefficient = (self.f(upper_value) - self.f(lower_value)) / (upper_value - lower_value)
-        self.graph.axes.plot(x, (x - lower_value) * coefficient + self.f(lower_value), linestyle="dashed")
-        self.graph.axes.plot(x, x * 0, linestyle='dotted')
-        self.graph.draw()
+        flower = step[-2]
+        fupper = step[-1]
+        self.graph.axes.plot((lower_value, upper_value), (flower, fupper), linestyle="dashed", color="g")
+        # step = self.steps[self.step_position]
+        # lower_value = step[0]
+        # upper_value = step[1]
+        # initial_step = self.steps[0]
+        # initial_lower = initial_step[0]
+        # initial_upper = initial_step[1]
+        # x = linspace(initial_lower, initial_upper, 10)
+        # # self.graph.axes.set_xlim(graph_x_min, graph_x_max)
+        # # self.graph.axes.set_ylim(graph_x_min, graph_x_max)
+        # coefficient = (steps[-2]- self.f(lower_value)) / (upper_value - lower_value)
+        # self.graph.axes.plot(x, (x - lower_value) * coefficient + self.f(lower_value), linestyle="dashed")
+        # self.graph.axes.plot(x, x * 0, linestyle='dotted')
+        # self.graph.draw()
 
     def plot(self, graph):
         self.graph = graph
-        step = self.steps[self.step_position]
+        step = self.steps[0]
         lower = step[0]
         upper = step[1]
-        x = linspace(lower - fabs(upper) * self.scale,
-                     upper + fabs(upper) * self.scale, 100)
+        x = linspace(lower, upper, 10000)
         graph.axes.clear()
-        graph.axes.plot(x, eval(self.equation))
+        graph.axes.plot(x, eval(self.equation), linewidth=1)
         self.plot_step()
-        graph.axes.axhline(0, color="black")
-        graph.axes.axvline(0, color="black")
+        graph.axes.axhline(0, color="k", linewidth=1)
+        graph.axes.axvline(0, color="k", linewidth=1)
         graph.draw()
 
     def next_step(self):
@@ -122,3 +138,16 @@ class Secant(Method):
 
     def output_file(self):
         pass
+
+    def get_errors(self):
+        if len(self.steps) == 0:
+            return []
+        else:
+            return [row[4] for row in self.steps]
+
+    def get_roots(self):
+        if len(self.steps) == 0:
+            return []
+        else:
+            return [row[2] for row in self.steps]
+

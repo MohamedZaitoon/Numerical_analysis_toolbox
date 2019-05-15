@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.uic import loadUi
 from matplotlib.backends.backend_qt5agg import (NavigationToolbar2QT as NavigationToolbar)
 from numpy import *
-
+import traceback
 from root_finder_methods.FalsePosition import FalsePosition
 from root_finder_methods.GeneralAlgorithm import GeneralAlgorithm
 from root_finder_methods.bierge_vieta import BiergeVieta
@@ -11,6 +11,7 @@ from root_finder_methods.fixed_point import FixedPoint
 from root_finder_methods.secant import Secant
 from root_finder_methods.newtonRaphson import NewtonRaphson
 from ui.keypad import EquationForm
+from ui.plot_all_controller import AllMethodsPlot
 
 
 class MatPlotLibWidget(QMainWindow):
@@ -19,7 +20,7 @@ class MatPlotLibWidget(QMainWindow):
         QMainWindow.__init__(self)
         loadUi("main_window.ui", self)
         self.method = None
-        self.equation = None
+        self.equation = "sin(x)-x-5"
         layout = QVBoxLayout()
         layout.addWidget(NavigationToolbar(self.MplWidget.canvas, self))
         self.graph_adjustments.setLayout(layout)
@@ -29,11 +30,7 @@ class MatPlotLibWidget(QMainWindow):
         self.adjust_criteria_button.clicked.connect(self.adjust_criteria)
         self.selected_method.activated.connect(self.adjust_parameters)
 
-        self.scale_slider.setTickInterval(100)
-        self.scale_slider.setMinimum(0)
-        self.scale_slider.setSingleStep(1)
-        self.scale_slider.sliderMoved.connect(self.slider_moved)
-        self.scale = 1
+        self.dialogs = list()
 
         self.current_absolute = 0.00001
         self.current_iterations = 50
@@ -89,11 +86,20 @@ class MatPlotLibWidget(QMainWindow):
         elif current_method == "General Algorithm":
             self.method = GeneralAlgorithm(self.equation)
         elif current_method == "All Methods":
-            self.method = GeneralAlgorithm(self.equation)
+            try:
+                newWindow = AllMethodsPlot(self.equation, current_lower_value, current_upper_value,
+                                           self.current_absolute,
+                                           self.current_iterations)
+                self.dialogs.append(newWindow)
+                newWindow.show()
+            except Exception:
+                self.notification.setText("Error ")
+                print(Exception)
+                traceback.print_exc()
+            return
 
         self.method.set_absolute_error_criteria(self.current_absolute)
         self.method.set_max_iterations_criteria(self.current_iterations)
-        self.method.set_scale(self.scale)
         try:
             self.method.evaluate()
             if self.method.get_error():
@@ -103,7 +109,9 @@ class MatPlotLibWidget(QMainWindow):
             self.method.plot(self.MplWidget.canvas)
             self.show_results()
         except Exception:
-            self.notification.setText("Error")
+            self.notification.setText("Error ")
+            print(Exception)
+            traceback.print_exc()
 
     def clear_components(self):
         self.notification.setText("")
@@ -117,7 +125,7 @@ class MatPlotLibWidget(QMainWindow):
         self.absolute_error_text.setText("")
 
     def adjust_parameters(self):
-        two_parameter_method = ("Bisection", "Secant")
+        two_parameter_method = ("Bisection", "Secant", "All Methods", "False Position")
         one_parameter_method = ("Bierge-Vieta", "Fixed Point","Newton-Raphson")
         selected_method = self.selected_method.currentText()
         if two_parameter_method.count(selected_method) != 0:
@@ -134,10 +142,6 @@ class MatPlotLibWidget(QMainWindow):
         self.absolute_error_text.setText(str(self.method.get_absolute_error()))
         self.execution_time_text.setText(str(self.method.get_execution_time()))
 
-    def slider_moved(self):
-        value = self.scale_slider.value()
-        self.scale = value
-        self.scale_text.setText(str(value))
 
     def edit_function(self):
         self.dialog.show()

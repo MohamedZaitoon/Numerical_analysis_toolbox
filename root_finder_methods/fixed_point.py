@@ -1,20 +1,22 @@
-from root_finder_methods.abstract_method import Method
-from sympy import simplify, sympify
-from numpy import *
 import time
+
+from numpy import *
+from sympy import simplify, sympify
+
+from root_finder_methods.abstract_method import Method
 
 
 class FixedPoint(Method):
-    steps = []
 
     def __init__(self, equation, lower_value):
         self.equation = equation
-        self.lower_value = lower_value
+        self.lower_value = lower_value  # initial x0
         self.graph = None
+        self.steps = []
         self.root_value = None
         self.absolute_error = None
         self.error = False
-        self. g = ""
+        self.g = ""
         self.scale = 1
         self.start = 0
         self.end = 0
@@ -41,7 +43,8 @@ class FixedPoint(Method):
         self.equation = sympify(equation)
         self.start = time.time()
         g = self.get_g(equation)
-        x = self.lower_value
+        self.g = g
+        x = self.lower_value  # initial x0
         self.root_value = self.lower_value
         j = 0
         while j < self.max_iterations_criteria:
@@ -52,7 +55,7 @@ class FixedPoint(Method):
                 self.lower_value = self.root_value
                 self.root_value = round(new_x, 15)
                 break
-            self.lower_value = self.root_value
+            self.lower_value = new_x
             self.root_value = round(new_x, 15)
             x = new_x
             j = j + 1
@@ -81,32 +84,48 @@ class FixedPoint(Method):
         return self.root_value
 
     def plot_step(self):
+        y = 0
+        for i in range(self.step_position):
+            step = self.steps[i]
+            xi = step[0]
+            xin = step[1]
+            self.graph.axes.plot((xi, xi), (y, xin), 'y', linewidth=1)
+            self.graph.axes.plot((xi, xin), (xin, xin), 'y', linewidth=1)
+            y = xin
         step = self.steps[self.step_position]
-        lower_value = step[0]
-        upper_value = lower_value * 5 * self.scale
-        initial_step = self.steps[0]
-        initial_lower = initial_step[0]
-        initial_upper = initial_lower * 5 * self.scale
-        graph_x_min = (self.f(initial_lower - fabs(initial_upper) * self.scale)
-                       + lower_value - fabs(upper_value) * self.scale) / 2
-        graph_x_max = (self.f(initial_upper + fabs(initial_upper) * self.scale)
-                       + upper_value + fabs(upper_value) * self.scale) / 2
-        x = linspace(graph_x_min, graph_x_max, 1000)
-
-        self.graph.axes.plot(x, eval(str(self.g)), linestyle="dashed")
-        self.graph.draw()
+        xi = step[0]
+        xin = step[1]
+        self.graph.axes.plot((xi, xi), (y, xin), 'g')
+        self.graph.axes.plot((xi, xin), (xin, xin), 'r')
+        # step = self.steps[self.step_position]
+        # lower_value = step[0]
+        # upper_value = lower_value * 5 * self.scale
+        # initial_step = self.steps[0]
+        # initial_lower = initial_step[0]
+        # initial_upper = initial_lower * 5 * self.scale
+        # graph_x_min = (self.f(initial_lower - fabs(initial_upper) * self.scale)
+        #                + lower_value - fabs(upper_value) * self.scale) / 2
+        # graph_x_max = (self.f(initial_upper + fabs(initial_upper) * self.scale)
+        #                + upper_value + fabs(upper_value) * self.scale) / 2
+        # x = linspace(graph_x_min, graph_x_max, 1000)
+        #
+        # self.graph.axes.plot(x, eval(str(self.g)), linestyle="dashed")
+        # self.graph.draw()
 
     def plot(self, graph):
         self.graph = graph
-        step = self.steps[self.step_position]
+        step = self.steps[0]
         lower = step[0]
-        upper = lower * 5 * self.scale
-        x = linspace(lower - fabs(upper) * self.scale,
-                     upper + fabs(upper) * self.scale, 1000)
+        upper = lower * 5 + 5
+        root = self.get_root_value()
+        x = linspace(root - 5,
+                     root + 5, 1000)
         graph.axes.clear()
-        graph.axes.plot(x, eval(str(self.equation)))
-        graph.axes.axhline(0, color="black")
-        graph.axes.axvline(0, color="black")
+        graph.axes.plot(x, eval(str(self.g)), linewidth=1, color='c')
+        # graph.axes.plot(x, eval(str(self.equation)), linewidth=1, color='c')
+        graph.axes.plot(x, x, color='m', linewidth=1)
+        graph.axes.axhline(0, color="black", linewidth=1)
+        graph.axes.axvline(0, color="black", linewidth=1)
         self.plot_step()
         graph.draw()
 
@@ -129,3 +148,15 @@ class FixedPoint(Method):
 
     def output_file(self):
         pass
+
+    def get_errors(self):
+        if len(self.steps) == 0:
+            return []
+        else:
+            return [row[2] for row in self.steps]
+
+    def get_roots(self):
+        if len(self.steps) == 0:
+            return []
+        else:
+            return [row[1] for row in self.steps]

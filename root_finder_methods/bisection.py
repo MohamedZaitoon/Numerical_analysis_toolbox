@@ -6,10 +6,10 @@ from root_finder_methods.abstract_method import Method
 
 
 class Bisection(Method):
-    steps = []
 
     def __init__(self, equation, lower_value, upper_value):
         self.equation = equation
+        self.steps = []
         self.scale = 1
         self.graph = None
         self.step_position = 0
@@ -94,7 +94,7 @@ class Bisection(Method):
         initial_lower = initial_step[0]
         initial_upper = initial_step[1]
         self.graph.axes.set_xlim(initial_lower - 2, initial_upper + 2)
-        #self.graph.axes.set_ylim(initial_step[-2], initial_step[-1])
+        # self.graph.axes.set_ylim(initial_step[-2], initial_step[-1])
         self.graph.axes.axvline(lower_value, linestyle="dashed", color="r")
         self.graph.axes.axvline(upper_value, linestyle="dashed", color="g")
 
@@ -119,9 +119,10 @@ class Bisection(Method):
         initial_upper = initial_step[1]
         x = linspace(initial_lower - 10, initial_upper + 10, 1000)
         graph.axes.clear()
-        graph.axes.plot(x, eval(self.equation))
-        graph.axes.axhline(0, color="black")
-        graph.axes.axvline(0, color="black")
+        # self.graph.axes.set_xlim(lower_value-abs(lower_value*.3), upper_value+abs(upper_value*.3))
+        graph.axes.plot(x, eval(self.equation), linewidth=1)
+        graph.axes.axhline(0, color="black", linewidth=1)
+        graph.axes.axvline(0, color="black", linewidth=1)
         self.plot_step()
         graph.draw()
 
@@ -130,3 +131,15 @@ class Bisection(Method):
 
     def output_file(self):
         pass
+
+    def get_errors(self):
+        if len(self.steps) == 0:
+            return []
+        else:
+            return [row[3] for row in self.steps]
+
+    def get_roots(self):
+        if len(self.steps) == 0:
+            return []
+        else:
+            return [row[2] for row in self.steps]

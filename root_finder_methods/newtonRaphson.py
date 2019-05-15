@@ -22,7 +22,7 @@ class NewtonRaphson(Method):
         self.scale = None
         self.iterations = 0
         self.start = None
-        self.end = None
+        self.end = 0
         self.error = False
         self.current = 0  # current index for next & prev
 
@@ -98,22 +98,22 @@ class NewtonRaphson(Method):
         self.graph.axes.clear()
         lastx = self.tabel[len(self.tabel) - 1][1]
         if self.guess >= lastx:
-            x = linspace(lastx - 3, self.guess + 3, 100000)
+            x = linspace(lastx - 3, self.guess + 3, 10000)
             # self.graph.axes.plot([self.guess + 1, lastx - 1], [0, 0], 'k-')  # x-axis
             # graph.plot([0, 0], [self.guess + 3, lastx - 3], 'k-')  # y-axis
         else:
-            x = linspace(self.guess - 3, lastx + 3, 100000)
+            x = linspace(self.guess - 3, lastx + 3, 10000)
             # self.graph.axes.plot([self.guess - 1, lastx + 1], [0, 0], 'k-')  # x-axis
             # self.graph.axes.plot([0, 0], [self.guess - 3, lastx + 3], 'k-')  # y-axis
         self.graph.axes.plot(x, eval(self.equation))
 
         for i in range(0, self.current + 1):
             row = self.tabel[i]
-            self.graph.axes.plot([row[0], row[1]], [self.__f(row[0]), 0])
-            self.graph.axes.plot([row[0], row[0]], [0, self.__f(row[0])])
-            self.graph.axes.plot([row[1], row[1]], [0, self.__f(row[1])])
-        graph.axes.axhline(0, color="black")
-        graph.axes.axvline(0, color="black")
+            self.graph.axes.plot([row[0], row[1]], [self.__f(row[0]), 0], linewidth=1)
+            self.graph.axes.plot([row[0], row[0]], [0, self.__f(row[0])], linewidth=1)
+            self.graph.axes.plot([row[1], row[1]], [0, self.__f(row[1])], linewidth=1)
+        graph.axes.axhline(0, color="black", linewidth=1)
+        graph.axes.axvline(0, color="black", linewidth=1)
         self.graph.draw()
         pass
 
@@ -147,6 +147,18 @@ class NewtonRaphson(Method):
         dydx = deriv.doit()
         dy = StringFunction(str(dydx))
         return dy(x)
+
+    def get_errors(self):
+        if len(self.tabel) == 0:
+            return []
+        else:
+            return [row[2] for row in self.tabel]
+
+    def get_roots(self):
+        if len(self.tabel) == 0:
+            return []
+        else:
+            return [row[1] for row in self.tabel]
 
 
 class PrintToFile:

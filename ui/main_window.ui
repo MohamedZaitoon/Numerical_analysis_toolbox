@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>847</width>
-    <height>563</height>
+    <width>840</width>
+    <height>577</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -217,6 +217,11 @@
     <item>
      <property name="text">
       <string>General Algorithm</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>All Methods</string>
      </property>
     </item>
    </widget>
@@ -651,7 +656,7 @@
       <x>270</x>
       <y>360</y>
       <width>541</width>
-      <height>161</height>
+      <height>181</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -667,7 +672,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>80</y>
+       <y>110</y>
        <width>90</width>
        <height>25</height>
       </rect>
@@ -684,7 +689,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>45</y>
+       <y>75</y>
        <width>90</width>
        <height>25</height>
       </rect>
@@ -701,7 +706,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>10</y>
+       <y>40</y>
        <width>90</width>
        <height>25</height>
       </rect>
@@ -717,9 +722,9 @@
     <widget class="QPushButton" name="solve_button">
      <property name="geometry">
       <rect>
-       <x>440</x>
-       <y>110</y>
-       <width>90</width>
+       <x>339</x>
+       <y>130</y>
+       <width>191</width>
        <height>41</height>
       </rect>
      </property>
@@ -741,7 +746,7 @@
      <property name="geometry">
       <rect>
        <x>120</x>
-       <y>10</y>
+       <y>40</y>
        <width>180</width>
        <height>25</height>
       </rect>
@@ -760,7 +765,7 @@
      <property name="geometry">
       <rect>
        <x>120</x>
-       <y>45</y>
+       <y>75</y>
        <width>180</width>
        <height>25</height>
       </rect>
@@ -779,7 +784,7 @@
      <property name="geometry">
       <rect>
        <x>120</x>
-       <y>80</y>
+       <y>110</y>
        <width>180</width>
        <height>25</height>
       </rect>
@@ -798,7 +803,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>115</y>
+       <y>145</y>
        <width>90</width>
        <height>25</height>
       </rect>
@@ -815,7 +820,7 @@
      <property name="geometry">
       <rect>
        <x>120</x>
-       <y>115</y>
+       <y>145</y>
        <width>180</width>
        <height>25</height>
       </rect>
@@ -833,7 +838,7 @@
     <widget class="QLabel" name="T">
      <property name="geometry">
       <rect>
-       <x>310</x>
+       <x>330</x>
        <y>10</y>
        <width>101</width>
        <height>25</height>
@@ -850,9 +855,9 @@
     <widget class="QLineEdit" name="theoretical_bound_text">
      <property name="geometry">
       <rect>
-       <x>420</x>
-       <y>10</y>
-       <width>101</width>
+       <x>340</x>
+       <y>50</y>
+       <width>181</width>
        <height>25</height>
       </rect>
      </property>
@@ -866,11 +871,11 @@
       <string>_____</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="compare_button">
+    <widget class="QPushButton" name="read_file">
      <property name="geometry">
       <rect>
        <x>440</x>
-       <y>60</y>
+       <y>80</y>
        <width>90</width>
        <height>41</height>
       </rect>
@@ -886,15 +891,38 @@
 </string>
      </property>
      <property name="text">
-      <string>Compare</string>
+      <string>Read</string>
      </property>
     </widget>
-    <widget class="QLabel" name="T_2">
+    <widget class="QPushButton" name="write_result">
      <property name="geometry">
       <rect>
-       <x>310</x>
-       <y>60</y>
-       <width>101</width>
+       <x>340</x>
+       <y>80</y>
+       <width>91</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="cursor">
+      <cursorShape>PointingHandCursor</cursorShape>
+     </property>
+     <property name="autoFillBackground">
+      <bool>false</bool>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(255, 39, 42);color:white;
+</string>
+     </property>
+     <property name="text">
+      <string>Extract Result</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="root_value_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>90</width>
        <height>25</height>
       </rect>
      </property>
@@ -903,28 +931,15 @@
 </string>
      </property>
      <property name="text">
-      <string>  Graph Scale</string>
+      <string>   Equation :</string>
      </property>
     </widget>
-    <widget class="QSlider" name="scale_slider">
+    <widget class="QLineEdit" name="equation_field">
      <property name="geometry">
       <rect>
-       <x>310</x>
-       <y>90</y>
-       <width>101</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="scale_text">
-     <property name="geometry">
-      <rect>
-       <x>310</x>
-       <y>120</y>
-       <width>101</width>
+       <x>120</x>
+       <y>10</y>
+       <width>180</width>
        <height>25</height>
       </rect>
      </property>
@@ -964,7 +979,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>847</width>
+     <width>840</width>
      <height>21</height>
     </rect>
    </property>
