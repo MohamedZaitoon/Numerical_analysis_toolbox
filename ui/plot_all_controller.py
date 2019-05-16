@@ -78,20 +78,18 @@ class AllMethodsPlot(QMainWindow, Ui_MainWindow):
             self.method = self.general
         elif current_method == "Iterations  Root":
             self.plot_it_roots()
-            return
         elif current_method == "Iterations  Error":
             self.plot_it_error()
-            return
-
-        try:
-            if self.method.get_error():
-                self.current_root.setText("Error")
-                return
-            self.method.plot(self.plotting_area.canvas)
-        except Exception:
-            self.current_root.setText("Error ")
-            print(Exception)
-            traceback.print_exc()
+        if self.method is not None:
+            try:
+                if self.method.get_error():
+                    self.current_root.setText("Error")
+                    return
+                self.method.plot(self.plotting_area.canvas)
+            except Exception:
+                self.current_root.setText("Error ")
+                print(Exception)
+                traceback.print_exc()
 
     def plot_it_roots(self):
         bir = self.bisection.get_roots()
@@ -105,35 +103,39 @@ class AllMethodsPlot(QMainWindow, Ui_MainWindow):
         self.plotting_area.canvas.axes.clear()
         if len(bir) != 0:
             biit = self.iterations_array(len(bir))
-            self.plot_array(biit, bir, "Bisection")
-        if len(bir) != 0:
+            self.plotting_area.canvas.axes.plot(list(biit), list(bir), label="Bisection")
+        if len(secr) != 0:
             secit = self.iterations_array(len(secr))
-            self.plot_array(secit, secr, "Secant")
-        if len(bir) != 0:
+            self.plotting_area.canvas.axes.plot(secit, secr, label="Secant")
+        if len(flsr) != 0:
             flsit = self.iterations_array(len(flsr))
-            self.plot_array(flsit, flsr, "False position")
-        if len(bir) != 0:
+            self.plotting_area.canvas.axes.plot(flsit, flsr, label="False position")
+        if len(fxr) != 0:
             fxit = self.iterations_array(len(fxr))
-            self.plot_array(fxit, fxr, "Fixed point")
-        if len(bir) != 0:
+            self.plotting_area.canvas.axes.plot(fxit, fxr, label="Fixed point")
+        if len(birgr) != 0:
             birgit = self.iterations_array(len(birgr))
-            self.plot_array(birgit, birgr, "Bierge vieta")
-        if len(bir) != 0:
+            self.plotting_area.canvas.axes.plot(birgit, birgr, label="Bierge vieta")
+        if len(newr) != 0:
             newit = self.iterations_array(len(newr))
-            self.plot_array(newit, newr, "Newton-Raphson")
-        if len(bir) != 0:
+            self.plotting_area.canvas.axes.plot(newit, newr, label="Newton-Raphson")
+        if len(genr) != 0:
             genit = self.iterations_array(len(genr))
-            self.plot_array(genit, genit, "General Algorithm")
-
-        #self.plotting_area.canvas.axes.legend()
+            self.plotting_area.canvas.axes.plot(genit, genit, label="General Algorithm")
+        self.plotting_area.canvas.axes.set_xlim(self.x1-2, self.x2+2)
+        self.plotting_area.canvas.axes.axvline(0)
+        self.plotting_area.canvas.axes.axhline(0)
+        self.plotting_area.canvas.axes.legend()
         self.plotting_area.canvas.show()
-
 
     def plot_array(self, x, y, lab):
         self.plotting_area.canvas.axes.plot(x, y, label=lab)
 
     def iterations_array(self, s: int):
-        return np.arange(0, s, 1)
+        l =[]
+        for i in range (s):
+            l.append(i)
+        return l
 
     def plot_it_error(self):
         bir = self.bisection.get_errors()
@@ -147,27 +149,29 @@ class AllMethodsPlot(QMainWindow, Ui_MainWindow):
         self.plotting_area.canvas.axes.clear()
         if len(bir) != 0:
             biit = self.iterations_array(len(bir))
-            self.plot_array(biit, bir, "Bisection")
-        if len(bir) != 0:
+            self.plotting_area.canvas.axes.plot(list(biit), list(bir), label="Bisection")
+        if len(secr) != 0:
             secit = self.iterations_array(len(secr))
-            self.plot_array(secit, secr, "Secant")
-        if len(bir) != 0:
+            self.plotting_area.canvas.axes.plot(secit, secr, label="Secant")
+        if len(flsr) != 0:
             flsit = self.iterations_array(len(flsr))
-            self.plot_array(flsit, flsr, "False position")
-        if len(bir) != 0:
+            self.plotting_area.canvas.axes.plot(flsit, flsr, label="False position")
+        if len(fxr) != 0:
             fxit = self.iterations_array(len(fxr))
-            self.plot_array(fxit, fxr, "Fixed point")
-        if len(bir) != 0:
+            self.plotting_area.canvas.axes.plot(fxit, fxr, label="Fixed point")
+        if len(birgr) != 0:
             birgit = self.iterations_array(len(birgr))
-            self.plot_array(birgit, birgr, "Bierge vieta")
-        if len(bir) != 0:
+            self.plotting_area.canvas.axes.plot(birgit, birgr, label="Bierge vieta")
+        if len(newr) != 0:
             newit = self.iterations_array(len(newr))
-            self.plot_array(newit, newr, "Newton-Raphson")
-        if len(bir) != 0:
+            self.plotting_area.canvas.axes.plot(newit, newr, label="Newton-Raphson")
+        if len(genr) != 0:
             genit = self.iterations_array(len(genr))
-            self.plot_array(genit, genit, "General Algorithm")
-
-       # self.plotting_area.canvas.axes.legend()
+            self.plotting_area.canvas.axes.plot(genit, genit, label="General Algorithm")
+        self.plotting_area.canvas.axes.axvline(0)
+        self.plotting_area.canvas.axes.axhline(0)
+        self.plotting_area.canvas.axes.set_xlim(self.x1 - 2, self.x2 + 2)
+        self.plotting_area.canvas.axes.legend()
         self.plotting_area.canvas.show()
 
     def next_step(self):

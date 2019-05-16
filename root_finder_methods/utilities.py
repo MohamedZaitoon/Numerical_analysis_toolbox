@@ -18,15 +18,28 @@ class Loader:
         content = [x.strip() for x in content]
 
         # error or max iterations
-        numint = int(content[3])
-        numfl = float(content[3])
+        print(content[3])
+        isFloat = False
+        isInt = False
+        try:
+            numint = int(content[3])
+            isInt = True
+        except Exception:
+            print("float number")
+        if isInt == False:
+            isFloat = True
+            try:
+                numfl = float(content[3])
+            except Exception:
+                print("Invalid Number")
 
         # switch methods
         name = content[1]
+        content[0] = content[0].replace("^", "**")
         if name.lower() == 'bisection':
             s = content[2].split()
             b = Bisection(content[0].strip(), float(s[0]), float(s[1]))
-            if str(numfl) == content[3]:
+            if isFloat:
                 b.absolute_error_criteria = numfl
             else:
                 b.max_iterations_criteria = numint
@@ -34,14 +47,14 @@ class Loader:
             return b
         elif name.lower() == 'newtonraphson':
             b = NewtonRaphson(content[0].strip(), float(content[2].strip()))
-            if str(numfl) == content[3]:
+            if isFloat:
                 b.absolute_error_criteria = numfl
             else:
                 b.max_iterations_criteria = numint
             return b
         elif name.lower() == 'fixedpoint':
             b = FixedPoint(content[0].strip(), float(content[2].strip()))
-            if str(numfl) == content[3]:
+            if isFloat:
                 b.absolute_error_criteria = numfl
             else:
                 b.max_iterations_criteria = numint
@@ -49,14 +62,14 @@ class Loader:
         elif name.lower() == 'secant':
             s = content[2].split()
             b = Secant(content[0].strip(), float(s[0]), float(s[1]))
-            if str(numfl) == content[3]:
+            if isFloat:
                 b.absolute_error_criteria = numfl
             else:
                 b.max_iterations_criteria = numint
             return b
         elif name.lower() == 'biergevieta':
             b = BiergeVieta(content[0].strip(), float(content[2].strip()))
-            if str(numfl) == content[3]:
+            if isFloat:
                 b.absolute_error_criteria = numfl
             else:
                 b.max_iterations_criteria = numint

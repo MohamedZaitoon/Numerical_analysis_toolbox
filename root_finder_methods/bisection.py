@@ -25,7 +25,7 @@ class Bisection(Method):
         self.end = 0
 
     def f(self, x):
-        return eval(self.equation, None, {'x': x})
+        return eval(self.equation, None, {'x': x, 'e':e})
 
     def are_guesses_valid(self):
         if (self.f(self.lower_value) * self.f(self.upper_value)) > 0:

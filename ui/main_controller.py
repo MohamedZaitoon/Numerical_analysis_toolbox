@@ -12,6 +12,7 @@ from root_finder_methods.secant import Secant
 from root_finder_methods.newtonRaphson import NewtonRaphson
 from ui.keypad import EquationForm
 from ui.plot_all_controller import AllMethodsPlot
+from root_finder_methods.utilities import Loader
 
 
 class MatPlotLibWidget(QMainWindow):
@@ -29,6 +30,8 @@ class MatPlotLibWidget(QMainWindow):
         self.previous_step_button.clicked.connect(self.previous_step)
         self.adjust_criteria_button.clicked.connect(self.adjust_criteria)
         self.selected_method.activated.connect(self.adjust_parameters)
+        self.read_file.clicked.connect(self.read)
+        self.write_result.clicked.connect(self.write)
 
         self.dialogs = list()
 
@@ -39,6 +42,30 @@ class MatPlotLibWidget(QMainWindow):
         self.iteration_counter = 0
         self.dialog = EquationForm(self)
         self.edit_function_button.clicked.connect(self.edit_function)
+
+    def read(self):
+
+        name = QFileDialog.getOpenFileName(self, "open File")
+        print(name[0])
+        ld = Loader(name[0])
+        m = ld.load()
+        self.method = m
+        if self.method is not None:
+            try:
+                self.method.evaluate()
+                if self.method.get_error():
+                    self.notification.setText("Method Error: Invalid guesses or divergence may occurred")
+                    return
+
+                self.method.plot(self.MplWidget.canvas)
+                self.show_results()
+            except Exception:
+                self.notification.setText("Error ")
+                traceback.print_exc()
+
+    def write(self):
+        if self.method is not None:
+            self.method.output_file()
 
     def solve(self):
         current_method = str(self.selected_method.currentText())
@@ -94,7 +121,6 @@ class MatPlotLibWidget(QMainWindow):
                 newWindow.show()
             except Exception:
                 self.notification.setText("Error ")
-                print(Exception)
                 traceback.print_exc()
             return
 
